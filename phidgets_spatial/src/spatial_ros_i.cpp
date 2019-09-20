@@ -178,9 +178,14 @@ SpatialRosI::SpatialRosI(ros::NodeHandle nh, ros::NodeHandle nh_private)
 
         spatial_->setDataInterval(data_interval_ms);
 
-        imu_pub_ = nh_.advertise<sensor_msgs::Imu>("imu/data_raw", 1);
+        
+        char rawTopicName[] = "imu00/data_raw";
+        snprintf(rawTopicName, sizeof(rawTopicName), "imu%02d/data_raw", hub_port);
+        imu_pub_ = nh_.advertise<sensor_msgs::Imu>(rawTopicName, 1);
 
-        cal_publisher_ = nh_.advertise<std_msgs::Bool>("imu/is_calibrated", 5,
+        char isCalibratedTopicName[] = "imu00/is_calibrated";
+        snprintf(isCalibratedTopicName, sizeof(isCalibratedTopicName), "imu%02d/is_calibrated", hub_port);
+        cal_publisher_ = nh_.advertise<std_msgs::Bool>(isCalibratedTopicName, 5,
                                                        true /* latched */);
 
         calibrate();
@@ -199,12 +204,15 @@ SpatialRosI::SpatialRosI(ros::NodeHandle nh, ros::NodeHandle nh_private)
         ROS_ERROR("Spatial: %s", err.what());
         throw;
     }
-
-    cal_srv_ = nh_.advertiseService("imu/calibrate",
+    char calibrateServiceName[] = "imu00/calibrate";
+    snprintf(calibrateServiceName, sizeof(calibrateServiceName), "imu%02d/calibrate", hub_port);
+    cal_srv_ = nh_.advertiseService(calibrateServiceName,
                                     &SpatialRosI::calibrateService, this);
 
+    char mageFieldTopicName[] = "imu00/mag";
+    snprintf(mageFieldTopicName, sizeof(mageFieldTopicName), "imu%02d/mag", hub_port);
     magnetic_field_pub_ =
-        nh_.advertise<sensor_msgs::MagneticField>("imu/mag", 1);
+        nh_.advertise<sensor_msgs::MagneticField>(mageFieldTopicName, 1);
 
     if (publish_rate_ > 0)
     {
