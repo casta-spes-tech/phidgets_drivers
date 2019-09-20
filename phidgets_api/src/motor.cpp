@@ -142,9 +142,10 @@ double Motor::getBackEMF() const
     PhidgetReturnCode ret = PhidgetDCMotor_getBackEMF(motor_handle_, &backemf);
     if (ret != EPHIDGET_OK)
     {
-        throw Phidget22Error("Failed to get back EMF for Motor channel " +
-                                 std::to_string(channel_),
-                             ret);
+        // throw Phidget22Error("Failed to get back EMF for Motor channel " +
+        //                          std::to_string(channel_),
+        //                      ret);
+        return 0.0;
     }
     return backemf;
 }
